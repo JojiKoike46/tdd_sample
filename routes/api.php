@@ -17,6 +17,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Customers
 Route::get('customers', function () {
 });
 
@@ -30,4 +31,20 @@ Route::put('customers/{customer_id}', function () {
 });
 
 Route::delete('customers/{customer_id}', function () {
+});
+
+// Reports
+Route::get('reports', function () {
+});
+
+Route::post('reports', function () {
+});
+
+Route::get('reports/{report_id}', function () {
+});
+
+Route::put('reports/{report_id}', function () {
+});
+
+Route::delete('reports/{report_id}', function () {
 });
