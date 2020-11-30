@@ -5,6 +5,9 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Response;
+use \App\Report;
+use \App\Customer;
 
 class CustomerTest extends TestCase
 {
@@ -123,8 +126,18 @@ class CustomerTest extends TestCase
      */
     public function GET_api_customers_idにGETでアクセスできる()
     {
-        $response = $this->get('/api/customers/1');
+        $customer_id = $this->getFirstCustomerId();
+        $response = $this->get('/api/customers/' . $customer_id);
         $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     */
+    public function GET_api_customer_idに存在しないcustomer_idでGETメソッドでアクセスすると404が返却される()
+    {
+        $response = $this->get('/api/customers/99999999');
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
     }
 
     /**
@@ -132,7 +145,8 @@ class CustomerTest extends TestCase
      */
     public function GET_api_customers_idにGETでアクセスするとJSONが返却される()
     {
-        $response = $this->get('/api/customers/1');
+        $customer_id = $this->getFirstCustomerId();
+        $response = $this->get('/api/customers/' . $customer_id);
         $this->assertThat($response->content(), $this->isJson());
     }
 
@@ -144,8 +158,33 @@ class CustomerTest extends TestCase
         $params = [
             'name' => 'Update',
         ];
-        $response = $this->putJson('/api/customers/1', $params);
+        $customer_id = $this->getFirstCustomerId();
+        $response = $this->putJson('/api/customers/' . $customer_id, $params);
         $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     */
+    public function PUT_api_customers_idにnameが含まれない場合422が返却される()
+    {
+        $params = [];
+        $customer_id = $this->getFirstCustomerId();
+        $response = $this->putJson('/api/customers/' . $customer_id, $params);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    /**
+     * @test
+     */
+    public function PUT_api_customers_idにnameが空の場合422が返却される()
+    {
+        $params = [
+            'name' => ''
+        ];
+        $customer_id = $this->getFirstCustomerId();
+        $response = $this->putJson('/api/customers/' . $customer_id, $params);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     /**
@@ -153,7 +192,33 @@ class CustomerTest extends TestCase
      */
     public function DELETE_api_customers_idにDELETEでアクセスできる()
     {
-        $response = $this->delete('/api/customers/1');
+        $customer_id = $this->getFirstCustomerId();
+        Report::query()->where('customer_id', $customer_id)->delete();
+        $response = $this->delete('/api/customers/' . $customer_id);
         $response->assertStatus(200);
+    }
+
+    /**
+     * @test
+     */
+    public function DELETE_api_customers_idに存在しないcustomer_idでアクセスすると404が返却される()
+    {
+        $response = $this->delete('/api/customers/999999999');
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
+    }
+
+    /**
+     * @test
+     */
+    public function DELETE_api_customers_idにReportが紐付いているcustomer_idでアクセスすると422が返却される()
+    {
+        $customer_id = $this->getFirstCustomerId();
+        $response = $this->delete('/api/customers/' . $customer_id);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    private function getFirstCustomerId()
+    {
+        return Customer::query()->first()->value('id');
     }
 }
