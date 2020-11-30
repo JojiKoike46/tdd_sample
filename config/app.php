@@ -78,7 +78,7 @@ return [
     |
     */
 
-    'locale' => 'ja_JP',
+    'locale' => 'ja',
 
     'faker_locale' => 'ja_JP',
 

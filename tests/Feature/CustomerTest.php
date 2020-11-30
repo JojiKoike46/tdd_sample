@@ -103,7 +103,25 @@ class CustomerTest extends TestCase
     /**
      * @test
      */
-    public function api_customers_idにGETでアクセスできる()
+    public function POST_api_customersのエラーレスポンスの確認()
+    {
+        $params = ['name' => ''];
+        $response = $this->postJson('api/customers', $params);
+        $error_response = [
+            'message' => "The given data was invalid.",
+            'errors' => [
+                'name' => [
+                    'name は必須項目です'
+                ],
+            ]
+        ];
+        $response->assertExactJson($error_response);
+    }
+
+    /**
+     * @test
+     */
+    public function GET_api_customers_idにGETでアクセスできる()
     {
         $response = $this->get('/api/customers/1');
         $response->assertStatus(200);
@@ -112,16 +130,28 @@ class CustomerTest extends TestCase
     /**
      * @test
      */
-    public function api_customers_idにPUTでアクセスできる()
+    public function GET_api_customers_idにGETでアクセスするとJSONが返却される()
     {
-        $response = $this->put('/api/customers/1');
+        $response = $this->get('/api/customers/1');
+        $this->assertThat($response->content(), $this->isJson());
+    }
+
+    /**
+     * @test
+     */
+    public function PUT_api_customers_idにPUTでアクセスできる()
+    {
+        $params = [
+            'name' => 'Update',
+        ];
+        $response = $this->putJson('/api/customers/1', $params);
         $response->assertStatus(200);
     }
 
     /**
      * @test
      */
-    public function api_customers_idにDELETEでアクセスできる()
+    public function DELETE_api_customers_idにDELETEでアクセスできる()
     {
         $response = $this->delete('/api/customers/1');
         $response->assertStatus(200);
