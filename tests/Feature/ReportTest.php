@@ -5,9 +5,19 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Customer;
+use App\Report;
 
 class ReportTest extends TestCase
 {
+    use RefreshDatabase;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->artisan('db:seed', ['--class' => 'TestDataSeeder']);
+    }
+
     /**
      * @test
      */
@@ -22,7 +32,13 @@ class ReportTest extends TestCase
      */
     public function api_reportsにPOSTでアクセスできる()
     {
-        $response = $this->post('/api/reports');
+        $customerId = $this->getFirstCustomerId();
+        $params = [
+            'visit_date' => '2020-01-01',
+            'customer_id' => $customerId,
+            'detail' => 'detail text'
+        ];
+        $response = $this->postJson('/api/reports', $params);
         $response->assertStatus(200);
     }
 
@@ -31,7 +47,8 @@ class ReportTest extends TestCase
      */
     public function api_reports_idでGETにアクセスできる()
     {
-        $response = $this->get('/api/reports/1');
+        $reportId = $this->getFirstReportId();
+        $response = $this->get('/api/reports/' . $reportId);
         $response->assertStatus(200);
     }
 
@@ -40,7 +57,14 @@ class ReportTest extends TestCase
      */
     public function api_reports_idでPUTにアクセスできる()
     {
-        $response = $this->put('/api/reports/1');
+        $report_id = $this->getFirstReportId();
+        $customer_id = $this->getFirstCustomerId();
+        $params = [
+            'visit_date' => '2020-11-30',
+            'customer_id' => $customer_id,
+            'detail' => 'detail text'
+        ];
+        $response = $this->putJson('/api/reports/' . $report_id, $params);
         $response->assertStatus(200);
     }
 
@@ -49,7 +73,18 @@ class ReportTest extends TestCase
      */
     public function api_reports_idでDELETEにアクセスできる()
     {
-        $response = $this->delete('/api/reports/1');
+        $report_id = $this->getFirstReportId();
+        $response = $this->delete('/api/reports/' . $report_id);
         $response->assertStatus(200);
+    }
+
+    private function getFirstCustomerId()
+    {
+        return Customer::query()->first()->value('id');
+    }
+
+    private function getFirstReportId()
+    {
+        return Report::query()->first()->value('id');
     }
 }
