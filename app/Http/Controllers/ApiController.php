@@ -83,6 +83,12 @@ class ApiController extends Controller
         if (!$reportService->exists($report_id)) {
             abort(Response::HTTP_NOT_FOUND);
         }
+        $rules = [
+            'visit_date' => 'required|date',
+            'customer_id' => 'required|exists:customers,id',
+            'detail' => 'required'
+        ];
+        $this->validate($request, $rules);
         $reportService->updateReport($report_id, $request->only('visit_date', 'customer_id', 'detail'));
     }
 
