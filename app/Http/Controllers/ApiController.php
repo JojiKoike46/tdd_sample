@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\CustomerService;
+use App\Services\ReportService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -53,23 +54,49 @@ class ApiController extends Controller
         $customerService->deleteCustomer($customer_id);
     }
 
-    public function getReports()
+    public function getReports(ReportService $reportService)
     {
+        return response()->json($reportService->getReports());
     }
 
-    public function postReport()
+    public function postReport(Request $request, ReportService $reportService)
     {
+        $rules = [
+            'visit_date' => 'required|date',
+            'customer_id' => 'required|exists:customers,id',
+            'detail' => 'required'
+        ];
+        $this->validate($request, $rules);
+        $reportService->addReport($request->only('visit_date', 'customer_id', 'detail'));
     }
 
-    public function getReport($report_id)
+    public function getReport($report_id, ReportService $reportService)
     {
+        if (!$reportService->exists($report_id)) {
+            abort(Response::HTTP_NOT_FOUND);
+        }
+        return $reportService->getReport($report_id);
     }
 
-    public function putReport($report_id, Request $request)
+    public function putReport($report_id, Request $request, ReportService $reportService)
     {
+        if (!$reportService->exists($report_id)) {
+            abort(Response::HTTP_NOT_FOUND);
+        }
+        $rules = [
+            'visit_date' => 'required|date',
+            'customer_id' => 'required|exists:customers,id',
+            'detail' => 'required'
+        ];
+        $this->validate($request, $rules);
+        $reportService->updateReport($report_id, $request->only('visit_date', 'customer_id', 'detail'));
     }
 
-    public function deleteReport($report_id)
+    public function deleteReport($report_id, ReportService $reportService)
     {
+        if (!$reportService->exists($report_id)) {
+            abort(Response::HTTP_NOT_FOUND);
+        }
+        $reportService->deleteReport($report_id);
     }
 }
