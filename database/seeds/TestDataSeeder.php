@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use App\DataProvider\Eloquent\Customer;
+use App\DataProvider\Eloquent\Report;
 
 class TestDataSeeder extends Seeder
 {
@@ -11,10 +13,10 @@ class TestDataSeeder extends Seeder
      */
     public function run()
     {
-        factory(\App\Customer::class, 2)
+        factory(Customer::class, 2)
             ->create()
             ->each(function ($customer) {
-                factory(\App\Report::class, 2)
+                factory(Report::class, 2)
                     ->make()
                     ->each(function ($report) use ($customer) {
                         $customer->reports()->save($report);
