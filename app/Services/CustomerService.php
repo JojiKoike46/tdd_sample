@@ -2,51 +2,55 @@
 
 namespace App\Services;
 
-use App\Customer;
-use App\Report;
+use App\DataProvider\CustomerRepositoryInterface;
+use App\DataProvider\ReportRepositoryInterface;
 
 class CustomerService
 {
+
+    private $customer;
+    private $report;
+
+    public function __construct(
+        CustomerRepositoryInterface $customer,
+        ReportRepositoryInterface $report
+    ) {
+        $this->customer = $customer;
+        $this->report = $report;
+    }
+
     public function getCustomers()
     {
-        return Customer::query()->select(['id', 'name'])->get();
+        return $this->customer->getCustomers();
     }
 
     public function addCustomer($name)
     {
-        $customer = new Customer();
-        $customer->name = $name;
-        $customer->save();
+        $this->customer->addCustomer($name);
     }
 
     public function getCustomer($customer_id)
     {
-        return Customer::query()
-            ->where('id', '=', $customer_id)
-            ->select(['id', 'name'])
-            ->first();
+        return $this->customer->getCustomer($customer_id);
     }
 
     public function exists($customer_id)
     {
-        return Customer::query()
-            ->where('id', '=', $customer_id)->exists();
+        return $this->customer->exists($customer_id);
     }
 
     public function updateCustomer($customer_id, $name)
     {
-        $customer = Customer::query()->find($customer_id);
-        $customer->name = $name;
-        $customer->save();
+        $this->customer->updateCustomer($customer_id, $name);
     }
 
     public function deleteCustomer($customer_id)
     {
-        Customer::query()->where('id', '=', $customer_id)->delete();
+        $this->customer->deleteCustomer($customer_id);
     }
 
     public function hasReports($customer_id)
     {
-        return Report::query()->where('customer_id', '=', $customer_id)->exists();
+        return $this->report->hasReports($customer_id);
     }
 }

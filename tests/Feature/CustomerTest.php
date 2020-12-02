@@ -6,8 +6,8 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
-use \App\Report;
-use \App\Customer;
+use \App\DataProvider\Eloquent\Customer;
+use \App\DataProvider\Eloquent\Report;
 
 class CustomerTest extends TestCase
 {
