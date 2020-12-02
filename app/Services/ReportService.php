@@ -2,51 +2,45 @@
 
 namespace App\Services;
 
-use App\Report;
-use App\Customer;
+use App\DataProvider\ReportRepositoryInterface;
 
 class ReportService
 {
+
+    private $report;
+
+    public function __construct(ReportRepositoryInterface $report)
+    {
+        $this->report = $report;
+    }
+
     public function getReports()
     {
-        return Report::query()
-            ->select(['id', 'visit_date', 'customer_id', 'detail'])
-            ->get();
+        return $this->report->getReports();
     }
 
     public function addReport(array $params)
     {
-        $report = new Report();
-        $report->visit_date = array_get($params, 'visit_date');
-        $report->customer_id = array_get($params, 'customer_id');
-        $report->detail = array_get($params, 'detail');
-        $report->save();
+        $this->report->addReport($params);
     }
 
     public function getReport($report_id)
     {
-        return Report::query()
-            ->where('id', '=', $report_id)
-            ->select(['id', 'visit_date', 'customer_id', 'detail'])
-            ->first();
+        return $this->report->getReport($report_id);
     }
 
     public function updateReport($report_id, array $params)
     {
-        $report = Report::query()->find($report_id);
-        $report->visit_date = array_get($params, 'visit_date');
-        $report->customer_id = array_get($params, 'customer_id');
-        $report->detail = array_get($params, 'detail');
-        $report->save();
+        $this->report->updateReport($report_id, $params);
     }
 
     public function deleteReport($report_id)
     {
-        Report::query()->where('id', '=', $report_id)->delete();
+        $this->report->deleteReport($report_id);
     }
 
     public function exists($report_id)
     {
-        return Report::query()->where('id', '=', $report_id)->exists();
+        return $this->report->exists($report_id);
     }
 }
