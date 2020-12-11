@@ -6,7 +6,6 @@ namespace App\DataProvider;
 
 use App\DataProvider\CustomerRepositoryInterface;
 use \App\DataProvider\Eloquent\Customer;
-use \App\DataProvider\Eloquent\Report;
 
 class CustomerRepository implements CustomerRepositoryInterface
 {
